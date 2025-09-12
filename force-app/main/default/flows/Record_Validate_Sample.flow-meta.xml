@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Validate_Record</name>
+        <label>Validate Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>RecordValidator</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Are_there_any_errors_on_the_Record</targetReference>
+        </connector>
+        <dataTypeMappings>
+            <typeName>T__records</typeName>
+            <typeValue>Test_Object__c</typeValue>
+        </dataTypeMappings>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>records</name>
+            <value>
+                <elementReference>Test_Record</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>RecordValidator</nameSegment>
+        <offset>0</offset>
+        <outputParameters>
+            <assignToReference>Parsed_Errors</assignToReference>
+            <name>parsedErrors</name>
+        </outputParameters>
+    </actionCalls>
     <apiVersion>64.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <customProperties>
@@ -8,6 +36,28 @@
             <stringValue>{&quot;location&quot;:&quot;top&quot;,&quot;type&quot;:&quot;simple&quot;}</stringValue>
         </value>
     </customProperties>
+    <decisions>
+        <name>Are_there_any_errors_on_the_Record</name>
+        <label>Are there any errors on the Record?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>There_are_errors</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Parsed_Errors</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>See_Parsed_Errors</targetReference>
+            </connector>
+            <label>There are errors</label>
+        </rules>
+    </decisions>
     <environments>Default</environments>
     <interviewLabel>Record Validate Sample {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Record Validate Sample</label>
@@ -31,6 +81,30 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <screens>
+        <name>See_Parsed_Errors</name>
+        <label>See Parsed Errors</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <fields>
+            <name>Parsed_Errors_Display_Text</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;font-size: 16px; color: rgb(255, 0, 0);&quot;&gt;Errors found: {!Parsed_Errors}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
         <name>User_Input_Screen</name>
         <label>User Input Screen</label>
         <locationX>0</locationX>
@@ -38,6 +112,23 @@
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
+        <connector>
+            <targetReference>Validate_Record</targetReference>
+        </connector>
+        <fields>
+            <fieldType>ObjectProvided</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>false</isRequired>
+            <objectFieldReference>Test_Record.Name</objectFieldReference>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
     </screens>
@@ -48,5 +139,20 @@
             <targetReference>User_Input_Screen</targetReference>
         </connector>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
+    <variables>
+        <name>Parsed_Errors</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>Test_Record</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Test_Object__c</objectType>
+    </variables>
 </Flow>
