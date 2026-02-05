@@ -1,0 +1,28 @@
+name: Salesforce CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  validate-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Salesforce CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authenticate to Salesforce
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
+          sfdx auth:sfdxurl:store -f sfdx_auth.txt -a ciOrg
+
+      - name: Deploy to org
+        run: |
+          sfdx force:source:deploy -p force-app -u ciOrg -l RunLocalTests
+
